@@ -32,33 +32,22 @@ Aplicación móvil de tareas desarrollada con **Ionic React**, diseñada para fu
 git clone https://tu-repo.git
 cd nombre-del-proyecto
 2. Instala las dependencias
-bash
-Copiar
-Editar
+
 npm install
 3. Configura la URL del backend
 Edita el archivo services/todoService.ts y reemplaza la IP por la de tu servidor local:
 
-ts
-Copiar
-Editar
 const API_URL = 'http://TU_IP_LOCAL:3000/api/task';
 Ejemplo:
 
-ts
-Copiar
-Editar
+
 const API_URL = 'http://192.168.1.58:3000/api/task';
 Asegúrate de que tu backend esté corriendo en esa IP y puerto (por ejemplo con npm run dev en Express).
 
 4. Sincroniza Capacitor con Android
-bash
-Copiar
-Editar
+
 ionic build
 npx cap sync android
 5. Abre el proyecto en Android Studio
-bash
-Copiar
-Editar
+
 npx cap open android
