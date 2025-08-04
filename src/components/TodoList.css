@@ -1,0 +1,14 @@
+
+/* Espaciado general de la lista */
+.todo-list {
+  margin-top: 1rem;
+  padding: 0;
+}
+
+/* Cuando no hay ítems */
+.todo-list .empty {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  padding: 1rem 0;
+}

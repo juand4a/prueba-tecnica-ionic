@@ -1,0 +1,51 @@
+/* TodoItem.css */
+
+/* General styles for the todo item */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff; /* White background for the card */
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px); /* Lift effect on hover */
+  background-color: #f9f9f9; /* Light gray background on hover */
+}
+
+/* Style for completed tasks */
+.completed {
+  text-decoration: line-through;
+  color: #aaa; /* Gray color for completed tasks */
+}
+
+/* Checkbox styles */
+ion-checkbox {
+  margin-right: 12px; /* Space between checkbox and task text */
+}
+
+/* Button styles */
+ion-button {
+  margin-left: 8px; /* Space between buttons */
+  border-radius: 4px; /* Rounded corners for buttons */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+ion-button:hover {
+  opacity: 0.8; /* Slightly transparent on hover */
+}
+
+/* Danger button styles */
+ion-button[color="danger"] {
+  background-color: #ff3e3e; /* Red color for delete button */
+  color: white;
+}
+
+ion-button[color="danger"]:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}

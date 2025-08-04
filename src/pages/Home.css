@@ -1,0 +1,91 @@
+/* Contenedor general */
+.content-custom {
+  --background: #f2f5f8;
+  padding: 16px;
+}
+
+/* Toolbar */
+.toolbar-custom {
+  --background: #4a86d4;
+  color: #ffffff;
+}
+
+/* Formulario */
+.form-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+}
+
+/* Ítems (inputs, selects, textarea) */
+.item-custom {
+  --background: transparent;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --inner-border-width: 0 0 2px 0;
+  --inner-border-style: solid;
+  --inner-border-color: #cfd8dc;
+  margin-bottom: 20px;
+}
+
+/* Label apilado */
+.item-custom ion-label {
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #455a64;
+  padding: 10px;
+  font-size: 20px;
+}
+
+/* Input y textarea */
+.item-custom ion-input,
+.item-custom ion-textarea {
+  --padding-start: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --padding-end: 12px;
+  --background: #ffffff;
+  --border-radius: 6px;
+  border: 1px solid #cfd8dc;
+  font-size: 1rem;
+  color: #37474f;
+}
+
+/* Placeholder más suave */
+.item-custom ion-input::part(native),
+.item-custom ion-textarea::part(native) {
+  color: #37474f;
+}
+.item-custom ion-input::part(native)::placeholder,
+.item-custom ion-textarea::part(native)::placeholder {
+  color: #90a4ae;
+  opacity: 0.8;
+}
+
+/* Select personalizado */
+.item-custom ion-select {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --background: #ffffff;
+  --border-radius: 6px;
+  border: 1px solid #cfd8dc;
+  font-size: 1rem;
+  color: #37474f;
+}
+
+/* Botón */
+.button-container {
+  margin-top: 16px;
+}
+.button-container ion-button {
+  --background: #4a86d4;
+  --background-activated: #3b76c2;
+  --background-focused: #3b76c2;
+  --background-hover: #5a96e0;
+  --border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+}
