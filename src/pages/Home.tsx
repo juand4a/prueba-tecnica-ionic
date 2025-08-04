@@ -1,4 +1,3 @@
-
 import './Home.css';
 import React, { useState, useEffect } from 'react';
 import {
@@ -41,54 +40,50 @@ const Home: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showToast, setShowToast] = useState(false);
 
-useEffect(() => {
-  let syncInterval: NodeJS.Timeout;
+  useEffect(() => {
+    let syncInterval: NodeJS.Timeout;
 
-  const init = async () => {
-    await initDB();
-    const online = await isOnline();
+    const init = async () => {
+      await initDB();
+      const online = await isOnline();
 
-    if (online) {
-      await fullSync();
-    }
+      if (online) {
+        await fullSync();
+      }
 
-    const local = await getLocalTodos();
-    setTodos(local);
-  };
+      const local = await getLocalTodos();
+      setTodos(local);
+    };
 
-  const trySync = async () => {
-    const online = await isOnline();
-    if (!online) return;
+    const trySync = async () => {
+      const online = await isOnline();
+      if (!online) return;
 
-    try {
-      await fullSync();
-      const updated = await getLocalTodos();
-      setTodos(updated);
-      console.log('[SYNC] Sincronización exitosa');
-    } catch (err) {
-      console.warn('[SYNC] Error al sincronizar:', err);
-    }
-  };
+      try {
+        await fullSync();
+        const updated = await getLocalTodos();
+        setTodos(updated);
+        console.log('[SYNC] Sincronización exitosa');
+      } catch (err) {
+        console.warn('[SYNC] Error al sincronizar:', err);
+      }
+    };
 
-  // Ejecutar al montar
-  init();
+    init();
+    // eslint-disable-next-line prefer-const
+    syncInterval = setInterval(trySync, 10000);
 
-  // Iniciar intervalo de sincronización cada 30 segundos
-  // eslint-disable-next-line prefer-const
-  syncInterval = setInterval(trySync, 30000); // 30000ms = 30s
-
-  // Limpiar al desmontar
-  return () => {
-    if (syncInterval) {
-      clearInterval(syncInterval);
-    }
-  };
-}, []);
+    return () => {
+      if (syncInterval) {
+        clearInterval(syncInterval);
+      }
+    };
+  }, []);
 
   const handleCreate = async () => {
     if (!task.trim()) return;
     try {
-      await saveTodo(task);
+      await saveTodo(task); // Encola automáticamente
       setTask('');
       setShowToast(true);
       const local = await getLocalTodos();
@@ -100,7 +95,7 @@ useEffect(() => {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteLocalTodo(id);
+      await deleteLocalTodo(id); // Esta función ya encola 'delete'
       const local = await getLocalTodos();
       setTodos(local);
     } catch (e) {
@@ -110,7 +105,7 @@ useEffect(() => {
 
   const handleToggleComplete = async (id: number, completed: number) => {
     try {
-      await toggleLocalComplete(id, completed !== 1);
+      await toggleLocalComplete(id, completed !== 1); // Encola 'toggle'
       const local = await getLocalTodos();
       setTodos(local);
     } catch (e) {
@@ -125,7 +120,7 @@ useEffect(() => {
     if (!newText?.trim()) return;
 
     try {
-      await updateTodo(id, newText, false); // synced = false
+      await updateTodo(id, newText, false); // Encola 'update'
       const local = await getLocalTodos();
       setTodos(local);
     } catch (e) {

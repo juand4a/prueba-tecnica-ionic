@@ -15,13 +15,8 @@ const sqliteConn = new SQLiteConnection(CapacitorSQLite);
 let db: SQLiteDBConnection | undefined;
 const DB_NAME = 'tasksDB';
 
-/**
- * Inicializa la base de datos y la conexión SQLite
- */
 export async function initDB(): Promise<SQLiteDBConnection> {
-  if (db) {
-    return db;
-  }
+  if (db) return db;
 
   await sqliteConn.checkConnectionsConsistency();
 
@@ -32,104 +27,100 @@ export async function initDB(): Promise<SQLiteDBConnection> {
 
   await db.open();
 
-  const createStmt = `
+  const createTasksTable = `
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY NOT NULL,
       task TEXT NOT NULL,
       completed INTEGER NOT NULL DEFAULT 0,
       synced INTEGER NOT NULL DEFAULT 0
-    );
-  `;
+    );`;
 
-  await db.execute(createStmt);
+  const createSyncTable = `
+    CREATE TABLE IF NOT EXISTS sync_queue (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      action TEXT NOT NULL,
+      task_id INTEGER,
+      task TEXT,
+      completed INTEGER
+    );`;
+
+  await db.execute(createTasksTable);
+  await db.execute(createSyncTable);
 
   return db;
 }
 
-/**
- * Guarda una tarea nueva (no sincronizada)
- */
 export async function saveTodo(task: string): Promise<number> {
   const database = await initDB();
   const stmt = 'INSERT INTO tasks (task, completed, synced) VALUES (?, ?, ?);';
   const values = [task, 0, 0];
   const res = await database.run(stmt, values);
-  return res.changes?.lastId ?? -1;
+
+  const newId = res.changes?.lastId ?? -1;
+  await database.run(
+    'INSERT INTO sync_queue (action, task_id, task, completed) VALUES (?, ?, ?, ?);',
+    ['create', newId, task, 0]
+  );
+
+  return newId;
 }
 
-/**
- * Devuelve todas las tareas almacenadas localmente
- */
 export async function getTodos(): Promise<Todo[]> {
   const database = await initDB();
-  const stmt = 'SELECT * FROM tasks ORDER BY id DESC;';
-  const res = await database.query(stmt);
+  const res = await database.query('SELECT * FROM tasks ORDER BY id DESC;');
   return res.values as Todo[];
 }
 
-/**
- * Devuelve solo las tareas no sincronizadas (para enviar al backend)
- */
 export async function getUnsyncedTodos(): Promise<Todo[]> {
   const database = await initDB();
-  const stmt = 'SELECT * FROM tasks WHERE synced = 0;';
-  const res = await database.query(stmt);
+  const res = await database.query('SELECT * FROM tasks WHERE synced = 0;');
   return res.values as Todo[];
 }
 
-/**
- * Marca una tarea como sincronizada después de enviarla al backend
- */
 export async function markTodoAsSynced(id: number): Promise<void> {
   const database = await initDB();
-  const stmt = 'UPDATE tasks SET synced = 1 WHERE id = ?;';
-  await database.run(stmt, [id]);
+  await database.run('UPDATE tasks SET synced = 1 WHERE id = ?;', [id]);
 }
 
-/**
- * Actualiza el texto de una tarea y la marca como no sincronizada
- */
-export async function updateTodo(
-  id: number,
-  task: string,
-  synced: boolean = false
-): Promise<void> {
+export async function updateTodo(id: number, task: string, synced: boolean = false): Promise<void> {
   const database = await initDB();
-  const stmt = 'UPDATE tasks SET task = ?, synced = ? WHERE id = ?;';
-  const values = [task, synced ? 1 : 0, id];
-  await database.run(stmt, values);
+  await database.run('UPDATE tasks SET task = ?, synced = ? WHERE id = ?;', [
+    task,
+    synced ? 1 : 0,
+    id,
+  ]);
+  await database.run(
+    'INSERT INTO sync_queue (action, task_id, task) VALUES (?, ?, ?);',
+    ['update', id, task]
+  );
 }
 
-/**
- * Elimina una tarea local por ID
- */
 export async function deleteTodo(id: number): Promise<void> {
   const database = await initDB();
-  const stmt = 'DELETE FROM tasks WHERE id = ?;';
-  await database.run(stmt, [id]);
+  await database.run('DELETE FROM tasks WHERE id = ?;', [id]);
+  await database.run(
+    'INSERT INTO sync_queue (action, task_id) VALUES (?, ?);',
+    ['delete', id]
+  );
 }
 
-/**
- * Cambia el estado completado de una tarea
- */
 export async function toggleComplete(id: number, completed: boolean): Promise<void> {
   const database = await initDB();
-  const stmt = 'UPDATE tasks SET completed = ?, synced = 0 WHERE id = ?;';
-  const values = [completed ? 1 : 0, id];
-  await database.run(stmt, values);
+  await database.run('UPDATE tasks SET completed = ?, synced = 0 WHERE id = ?;', [
+    completed ? 1 : 0,
+    id,
+  ]);
+  await database.run(
+    'INSERT INTO sync_queue (action, task_id, completed) VALUES (?, ?, ?);',
+    ['toggle', id, completed ? 1 : 0]
+  );
 }
 
-/**
- * Elimina todas las tareas locales (usado para sobrescribir desde el backend)
- */
 export async function clearLocalTodos(): Promise<void> {
   const database = await initDB();
   await database.execute('DELETE FROM tasks');
 }
 
-/**
- * Sobrescribe todas las tareas locales con las tareas del backend
- */
 export async function overwriteLocalTasks(todos: Todo[]): Promise<void> {
   const database = await initDB();
   await clearLocalTodos();
@@ -139,4 +130,16 @@ export async function overwriteLocalTasks(todos: Todo[]): Promise<void> {
       [todo.id, todo.task, todo.completed, 1]
     );
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getSyncQueue(): Promise<any[]> {
+  const database = await initDB();
+  const res = await database.query('SELECT * FROM sync_queue ORDER BY id ASC');
+  return res.values || [];
+}
+
+export async function clearSyncQueue(): Promise<void> {
+  const database = await initDB();
+  await database.execute('DELETE FROM sync_queue');
 }
