@@ -1,38 +1,64 @@
 # 📱 Tareas Offline con Ionic + SQLite + Sincronización
 
-Este proyecto es una aplicación de tareas desarrollada con **Ionic React**, con soporte **offline-first** mediante **SQLite local**, que se sincroniza automáticamente con un backend REST API cuando hay conexión a internet.
+Aplicación móvil de tareas desarrollada con **Ionic React**, diseñada para funcionar completamente **offline** gracias a **SQLite local**, y con capacidad de sincronizar automáticamente con un backend cuando haya conexión a internet.
 
 ---
 
 ## 🚀 Características
 
-- ✔️ Agregar, editar, completar y eliminar tareas.
-- 🔌 Funciona completamente **sin conexión**.
-- 🔄 Sincronización automática cada 30 segundos cuando hay internet.
-- ☁️ Sincronización manual disponible desde el botón en la interfaz.
-- 📚 Cola de acciones (`sync_queue`) para asegurar integridad al reconectarse.
+- ✅ Crear, editar, completar y eliminar tareas.
+- 📴 Funciona completamente sin conexión (offline-first).
+- 🔄 Sincronización automática cada 30 segundos al detectar conexión.
+- 🔘 Botón para forzar sincronización manual desde la interfaz.
+- 📥 Cola de sincronización (`sync_queue`) para manejar tareas pendientes.
 
 ---
 
-## 🧩 Tecnologías
+## 🧰 Tecnologías utilizadas
 
-- **Ionic React** (UI + mobile)
-- **Capacitor SQLite** (`@capacitor-community/sqlite`)
-- **Axios** (peticiones HTTP)
-- **Backend API REST** (Node.js o cualquier compatible)
-- **Capacitor Network** (detección de conexión)
+- **Ionic React** – Framework para apps híbridas.
+- **@capacitor-community/sqlite** – Base de datos local persistente.
+- **Axios** – Cliente HTTP para sincronizar con el backend.
+- **Capacitor Network** – Para detectar el estado de conexión.
+- **Backend REST API** – Compatible con Node.js/Express o cualquier stack similar.
 
 ---
 
-## 📦 Instalación
+## 📦 Instalación y configuración
 
 ### 1. Clona el repositorio
 
-### 1. cambia la url de la api por tu ip
-en todoservice.ts const API_URL = 'http://192.168.1.58:3000/api/task';
+```bash
+git clone https://tu-repo.git
+cd nombre-del-proyecto
+2. Instala las dependencias
+bash
+Copiar
+Editar
+npm install
+3. Configura la URL del backend
+Edita el archivo services/todoService.ts y reemplaza la IP por la de tu servidor local:
 
-ajecuta  > ionic cap sync android
-ionic cap open android
-recuerda que debes tener android studio
+ts
+Copiar
+Editar
+const API_URL = 'http://TU_IP_LOCAL:3000/api/task';
+Ejemplo:
 
-y recuerda corred npm i para instalar las dependencias
+ts
+Copiar
+Editar
+const API_URL = 'http://192.168.1.58:3000/api/task';
+Asegúrate de que tu backend esté corriendo en esa IP y puerto (por ejemplo con npm run dev en Express).
+
+4. Sincroniza Capacitor con Android
+bash
+Copiar
+Editar
+ionic build
+npx cap sync android
+5. Abre el proyecto en Android Studio
+bash
+Copiar
+Editar
+npx cap open android
